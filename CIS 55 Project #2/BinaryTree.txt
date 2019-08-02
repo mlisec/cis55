@@ -1,0 +1,433 @@
+public class BinaryTree 
+{
+    private Node root;
+    private int size = 0;
+    double total = 0.0;
+    
+    public BinaryTree()
+    {
+        root = null;
+    }
+    public void insert(int n)
+    {
+    	Node current = root;
+    	Node newNode = new Node();
+
+    	newNode.data = n;
+    	newNode.left = null;
+    	newNode.right = null;
+    	
+    	size++;
+
+    	if (root == null)
+    	{
+    		root = newNode;
+    	}
+    	else
+    	{
+    		while(true)
+    		{
+    			if (newNode.data > current.data)
+    			{
+    				if (current.right == null)
+    				{
+    					current.right = newNode;
+    					break;
+    				}
+    				else
+    				{
+    					current = current.right;
+    				}
+    			}
+    			else
+    			{
+    				if (current.left == null)
+    				{
+    					current.left = newNode;
+    					break;
+    				}
+    				else
+    				{
+    					current = current.left;
+    				}
+    			}
+    				
+    		}
+    	}
+
+    }
+    public Node search(int n)
+    {
+    	Node current = root;
+            
+    	while (current != null)
+    	{
+    		if (current.data == n)
+    		{
+    			return current;
+    		}
+    		else if (current.data > n)
+    		{
+    			current = current.left;
+    		}
+    		else
+    		{
+    			current = current.right;
+    		}
+    	}
+    	return null;
+    }
+    public boolean remove(int n)
+    {
+    	// Check empty tree
+    	if (root == null)
+    	{
+    		return false;
+    	}
+
+    	// Prepare search for node
+    	Node current = root;
+    	Node parent = root;
+    	boolean currentIsLeft = true;
+    	
+    	while (current.data != n)
+    	{
+    		// currentIsLeft is true when current is finds n
+    		// and is a “left” child of parent
+    		parent = current;
+    		if (current.data > n)
+    		{
+    			currentIsLeft = true;
+    			current = current.left;
+    		}
+    		else
+    		{
+    			currentIsLeft = false;
+    			current = current.right;
+    		}
+    		
+    		// If current is null, node n was not found
+    		if (current == null)
+    		{
+    			return false;
+    		}
+    	}
+    	// At this point, current is the node to delete
+    	// Now, we check for the situations
+
+    	// Situation 1 - leaf node
+    	if (current.left == null && current.right == null)
+    	{
+
+    		// Check if current node is root
+    		if (parent == current)
+    		{
+    			root = null;
+    		}
+
+    		// Check which child pointer of parent to set
+    		else if (currentIsLeft)
+    		{
+    			parent.left = null;
+    		}
+    		else
+    		{
+    			parent.right = null;
+    		}
+    	}
+    		
+    		// Situation 2 - one child. Parent inherits child
+    		// or if current is root, root takes child
+    	else if (current.left == null)
+    		{
+    			if (parent == current)
+    			{
+    				root = current.right;
+    			}
+    			else if (currentIsLeft)
+    			{
+    				parent.left = current.right;
+    			}
+    			else
+    			{
+    				parent.right = current.right;
+    			}
+    		}
+    		else if (current.right == null)
+    		{
+    			if (parent == current)
+    			{
+    				root = current.left;
+    			}
+    			else if (currentIsLeft)
+    			{
+    				parent.left = current.left;
+    			}
+    			else
+    			{
+    				parent.right = current.left;
+    			}
+    		}
+    			// Situation 3: two children
+    		else
+    			{
+    				Node successor = getSuccessor(current);
+
+    				// Replace current node with successor
+    				if (parent == current)
+    				{
+    					root = successor;
+    				}
+    				else if (currentIsLeft)
+    				{
+    					parent.left = successor;
+    				}
+    				else
+    				{
+    					parent.right = successor;
+    				}
+
+    				// Successor will always come from the right, so
+    				// it must also take deleted node’s left child
+    				successor.left = current.left;
+    			}
+    			size--;
+    			return true;
+    		}
+    		
+    		private Node getSuccessor(Node removedNode)
+    		{
+    			// Prepare successor search by keeping track
+    			// of parent and current
+    			Node successorParent = removedNode;
+    			Node successor = removedNode;
+    			Node current = successor.right;
+    		        
+    			// Starting at the right child of the node to be
+    			// removed, go down the subtree’s left children
+    			// until there are no more children on the left
+    			while (current != null)
+    			{
+    				successorParent = successor;
+    				successor = current;
+    				current = current.left;
+    			}
+    			
+    			// if the successor is somewhere down the subtree,
+    			// the parent’s left child must take the
+    			// the successor’s right child. Then, the
+    			// successor’s right child takes the node
+    			// to delete’s right child (because successor will
+    			// be replacing it.
+    			if (successor != removedNode.right)
+    			{
+    				successorParent.left = successor.right;
+    		 		successor.right = removedNode.right;
+    			}
+
+    			// Note that if the successor is the immediate
+    			// right child of the node to delete, we just 
+    			// return that node (it has no left children and what
+    			// ever is on successor’s right stays that way even
+    			// after successor replaces the removed node.
+    			return successor;
+    		}
+    		
+    		public void inOrder()
+    		{
+    			displayInOrder(root);
+    		}
+
+    		void displayInOrder(Node current)
+    		{
+    			if (current != null)
+    			{
+    				displayInOrder(current.left);
+    				System.out.println(current.data);
+    				displayInOrder(current.right);
+    			}
+    		}
+    		public void preOrder()
+    		{
+    			displayPreOrder(root);
+    		}
+
+    		
+    		void displayPreOrder(Node current)
+    		{
+    			if (current != null)
+    			{
+    				System.out.println(current.data);
+    				displayPreOrder(current.left);
+    				displayPreOrder(current.right);
+    			}
+    		}
+    		public void postOrder()
+    		{
+    			displayPostOrder(root);
+    		}
+
+    		
+    		void displayPostOrder(Node current)
+    		{
+    			if (current != null)
+    			{
+    				displayPostOrder(current.left);
+    				displayPostOrder(current.right);
+    				System.out.println(current.data);
+    			}
+    		}
+
+    		
+    		/*
+    		 * Searches for oldValue in the tree. If found, 
+    		 * the data for that node is changed to newValue 
+    		 * and the tree is modified such that the node with 
+    		 * the new value is placed in the appropriate place 
+    		 * in the tree and returns true.
+    		 * If the oldValue is not found in the tree, the function 
+    		 * returns false and the tree stays as is
+    		 */
+    		public boolean update(int oldValue, int newValue)
+    		{
+    			
+    			if(search(oldValue) != null)
+    			{
+    				remove(oldValue);
+    				insert(newValue);
+    				return true;
+    			}
+    			return false;
+    		}
+    		
+    		/*
+    		 * If the tree is empty, return -1
+    		 * Otherwise, return the smallest value node in the tree
+    		 */
+    		public int findMin()
+    		{
+    			if(root == null)
+    			{
+    				return -1;
+    			}
+    			
+    			Node current, last = null;
+    			current = root; 
+    			while(current != null) 
+    			{
+    			last = current; 
+    			current = current.left; 
+    			}
+    			return last.data;
+    			
+    			
+    		}
+    		
+    		/*
+    		 * If the tree is empty, return -1
+    		 * Otherwise, return the largest value node in the tree
+    		 */
+    		public int findMax()
+    		{
+    			if(root == null)
+    			{
+    				return -1;
+    			}
+
+    			Node current, last = null;
+    			current = root; 
+    			while(current != null) 
+    			{
+    				last = current; 			
+    				current = current.right; 
+    			}
+    			return last.data;
+    		}
+    		
+    		/*
+    		 * If the tree is empty, return 0.0
+    		 * Otherwise, return the average value of 
+    		 * the tree by adding all node values and 
+    		 * dividing by the number of nodes in the tree
+    		 */
+    		
+    	
+    		  
+    		    public double calculateAverage() 
+        		{
+        			total = 0.0;
+    		    	return calcAverage(root);
+        			
+        		}
+
+        		double calcAverage(Node current)
+        		{
+        		
+        			if (current != null)
+        			{
+        				
+        				calcAverage(current.left);
+        				
+        				calcAverage(current.right);
+        				total += current.data;
+        			}
+        			return total/size;
+        		}
+    		
+    		/*
+    		 * Returns the number of nodes in the tree
+    		 */
+    		
+    		int getNumberOfNodes()
+    		{
+    			return size;
+    		}
+
+    		
+    		/*
+    		 * If the tree is empty, return false
+    		 * Otherwise, return true if the tree is balanced
+    		 * 	A balanced is tree is defined as follows:
+    		 * 		-If both of its subtrees are balanced
+    		 * 		-The height of its left subtree differs from the height of its right subtree by at most 1
+    		 * Hint: you may want a getHeight function and think of this entire solution recursively…
+    		 */
+ 
+    	
+    		public boolean isBalanced()
+    		{
+    			int height = checkBalance(root);
+    			if (height == -1)
+    			{
+    				return false;
+    			}
+    			return true;
+    		}
+    		
+    		private int checkBalance (Node root)
+    		{
+    			if (root == null)
+    			{
+    				return 0;
+    			}
+    			int leftSubtreeHeight = checkBalance(root.getLeft());
+    			if (leftSubtreeHeight == -1){
+    				return -1;
+    			}
+    			
+    			int rightSubtreeHeight = checkBalance(root.getRight());
+    			if(rightSubtreeHeight == -1)
+    			{
+    				return -1;
+    			}
+    			
+    			if (Math.abs(leftSubtreeHeight-rightSubtreeHeight) > 1)
+    			{
+    				return -1;
+    			}
+    			return (Math.max(leftSubtreeHeight,  rightSubtreeHeight)+1);
+    			
+    		}
+    			
+    }
+
